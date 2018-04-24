@@ -1,7 +1,8 @@
 from jira.client import JIRA
 import logging
+jira_url = "https://jira.spring.io"
 
-# Defines a function for connecting to Jira
+
 def connect_jira(log, jira_server, jira_user, jira_password):
     '''
     Connect to JIRA. Return None on error
@@ -17,15 +18,13 @@ def connect_jira(log, jira_server, jira_user, jira_password):
         return None
 
 
-# create logger
-log = logging.getLogger(__name__)
-
-# NOTE: You put your login details in the function call connect_jira(..) below!
-
-# create a connection object, jc
-jc = connect_jira(log, "https://jira.spring.io", "", "")
+def login(username, password):
+    log = logging.getLogger(__name__)
+    jc = connect_jira(log, jira_url, username, password)
+    yes = jc.search_issues(jql_str="key=XD-3745", expand="changelog", json_result=True)
+    return jc
 
 # print names of all projects
-projects = jc.projects()
-for v in projects:
-       print(v)
+# projects = jc.projects()
+# for v in projects:
+#        print(v)

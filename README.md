@@ -17,6 +17,6 @@ Extract sprint of an issue (Require Login credentials), run 'sprints_downloader.
 Customizable properties
 - Issue key
 
-
+Login
 * Username and Password using for Login should set at authen.py (username & password)
 * successful Login should return nothing

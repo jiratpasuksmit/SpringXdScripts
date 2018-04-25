@@ -20,3 +20,6 @@ Customizable properties
 Login
 * Username and Password using for Login should set at authen.py (username & password)
 * successful Login should return nothing
+
+FUTURE TASK
+- implement OAUTH to prevent request rejection (occured sometime)

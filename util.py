@@ -1,6 +1,3 @@
-username = ""
-password = ""
-jira_url = "jira.spring.io"
 file_type = ".csv"
 
 

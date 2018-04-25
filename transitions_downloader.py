@@ -33,4 +33,4 @@ if __name__ == '__main__':
     downloaded_issue = get_data(issue_key)
     transitions_history = extract_transitions(downloaded_issue)
 
-    util.write_csv(filename="transitions", field_names=field_names, data_records=transitions_history)
+    util.write_csv(filename="transitions_" + issue_key, field_names=field_names, data_records=transitions_history)

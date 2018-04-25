@@ -1,6 +1,10 @@
 from jira.client import JIRA
 import logging
-import util
+''' 
+YOUR USERNAME AND PASSWORD HERE
+'''
+username = ""
+password = ""
 jira_url = "https://jira.spring.io"
 
 
@@ -22,5 +26,7 @@ def connect_jira(log, jira_server, jira_user, jira_password):
 
 def login():
     log = logging.getLogger(__name__)
-    jc = connect_jira(log, jira_url, util.username, util.password)
+    jc = connect_jira(log, jira_url, username, password)
     return jc
+
+

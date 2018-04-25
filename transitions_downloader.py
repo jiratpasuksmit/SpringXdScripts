@@ -1,25 +1,36 @@
-import json
-from urllib.request import urlopen
+import authen
+import util
 
-jira_url = "jira.spring.io"
-base_url = "https://{project}/rest/api/2/search?jql=key={issue_id}&expand=changelog"
-file_type = ".csv"
-
-
-def build_filename(project_url, count):
-    from time import gmtime, strftime
-    time_text = strftime("%Y%m%d_%H%M%S", gmtime())
-    return project_url + "_" + time_text + "_" + str(count) + "rows" + file_type
+issue_key = "XD-3745"
+field_names = ['issue_key', 'developer', 'date', 'from_status', 'to_status', 'time_in_source_status', 'execution_time']
 
 
-def build_query_url(project_url, issue_id):
-    return base_url.format(project=project_url, issue_id=issue_id)
+def get_data(key):
+    jc = authen.login()
+    return jc.issue(id=key, expand="changelog")
+
+
+def extract_transitions(issue):
+    status_transitions = []
+    index_time = issue.fields.created
+    for history in issue.changelog.histories:
+        for item in history.items:
+            if item.field == 'status':
+                transition = [issue_key,
+                              history.author.displayName,
+                              history.created[0: 10],
+                              item.fromString,
+                              item.toString,
+                              util.diff_time(index_time, history.created),
+                              history.created]
+                index_time = history.created
+                status_transitions.append(transition)
+
+    return status_transitions
 
 
 if __name__ == '__main__':
-    issue_id = "XD-2610"
-    url = build_query_url(jira_url, issue_id)
-    raw_response = urlopen(url)
-    data = raw_response.read().decode("utf-8")
-    data_json = json.loads(data)
-    print("Y")
+    issue = get_data(issue_key)
+    transitions_history = extract_transitions(issue)
+
+    util.write_csv(filename="transitions", field_names=field_names, data_records=transitions_history)

@@ -12,7 +12,8 @@ def build_filename(project_url, count):
 
 def write_csv(filename, field_names, data_records):
     # fieldnames = ['Application Name', 'Application ID']
-    if len(data_records) == 0: return
+    if len(data_records) == 0:
+        return
 
     import csv
     with open(filename + '.csv', 'w') as csv_file:

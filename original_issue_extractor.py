@@ -1,10 +1,8 @@
 import authen
 import util
+import copy
 
 actual_sp_field_name = 'Actual Story Points'
-issue = None
-field_name_id_list = None
-field_before_estimate = None
 
 
 # def get_data(key):
@@ -12,17 +10,15 @@ field_before_estimate = None
 #     return jc.issue(id=key, expand="changelog")
 
 
-def extract_transitions():
-    global field_before_estimate
-    field_before_estimate = issue.fields
-    for history in reversed(issue.changelog.histories):
-        should_break = revert_change(history)
+def extract_transitions(fields, histories, field_name_id_list):
+    for history in reversed(histories):
+        should_break = revert_change(fields, history, field_name_id_list)
         if should_break:
             break
-    return field_before_estimate
+    return fields
 
 
-def revert_change(history):
+def revert_change(fields, history, field_name_id_list):
     found_actual_sp_change = False
     for item in history.items:
         if not found_actual_sp_change:
@@ -36,19 +32,35 @@ def revert_change(history):
             history_field_name_s = history_field_name + "s"
             original_field_name = history_field_name_s
 
-        global field_before_estimate
-        setattr(field_before_estimate, original_field_name, item.fromString)
+        setattr(fields, original_field_name, item.fromString)
 
     return found_actual_sp_change
 
 
-def run(_issue, _field_name_id_list):
-    global issue
-    issue = _issue
-    global field_name_id_list
-    field_name_id_list = _field_name_id_list
+# def changeKeyIdToKeyName(proxy, _field_id_name_list):
+#     dout = dict((_field_id_name_list[k.lower()], proxy[k]) for k in proxy.keys())
+#     return dout
 
-    transitions_history = extract_transitions()
 
-    field_names = next(iter(field_name_id_list.values()))
-    util.write_csv(filename="transitions_" + issue.key, field_names=field_names, data_records=transitions_history)
+def run(_issue, _field_name_id_list, _field_id_name_list):
+    issue_key = _issue.key
+    latest_fields = {}
+    latest_fields.update(vars(_issue.fields))
+
+    original_fields = vars(extract_transitions(
+        copy.deepcopy(_issue.fields),
+        copy.deepcopy(_issue.changelog.histories),
+        _field_name_id_list
+    ))
+
+    transitions_history = [latest_fields, original_fields]
+
+    field_names = list(_field_id_name_list.keys())
+    # field_names = []
+    # for key in latest_fields.keys():
+    #     if key in _field_id_name_list:
+    #         field_names.append(_field_id_name_list[key])
+    #     else:
+    #         field_names.append(key)
+
+    util.write_csv(filename="transitions_" + issue_key, field_names=field_names, data_records=transitions_history)

@@ -13,15 +13,22 @@ def write_csv(filename, field_names, data_records):
         return
 
     import csv
-    with open(filename + '.csv', 'w') as csv_file:
-        writer = csv.writer(csv_file, delimiter=',')
-        writer.writerow(field_names)
+    with open('report/' + filename + '.csv', 'w', newline='', encoding='utf-8') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=field_names, extrasaction='ignore')
+        writer.writeheader()
         for line in data_records:
             writer.writerow(line)
 
 
 def remove_space_and_special_char_lowercase(string):
     return ''.join(e for e in string.lower() if e.isalnum())
+
+
+def only_alphabet(string):
+    import re
+    regex = re.compile('[^a-zA-Z0-9]')
+    # First parameter is the replacement, second parameter is your input string
+    return regex.sub('', string)
 
 
 def diff_time(start, end):

@@ -20,6 +20,10 @@ def write_csv(filename, field_names, data_records):
             writer.writerow(line)
 
 
+def remove_space_and_special_char_lowercase(string):
+    return ''.join(e for e in string.lower() if e.isalnum())
+
+
 def diff_time(start, end):
     start = start[0:23]
     end = end[0:23]

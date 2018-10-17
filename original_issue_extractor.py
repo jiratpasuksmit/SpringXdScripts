@@ -3,6 +3,7 @@ import util
 import copy
 
 actual_sp_field_name = 'Actual Story Points'
+ISSUE_KEY = "issue_key"
 
 
 # def get_data(key):
@@ -24,8 +25,7 @@ def revert_change(fields, history, field_name_id_list):
         if not found_actual_sp_change:
             found_actual_sp_change = item.field == actual_sp_field_name
 
-        history_field_name = util.remove_space_and_special_char_lowercase(item.field)
-        # original_field_name = field_name_id_list[history_field_name]
+        history_field_name = util.only_alphabet_lowercase(item.field)
         if history_field_name in field_name_id_list.keys():
             original_field_name = field_name_id_list[history_field_name]
         else:
@@ -37,30 +37,26 @@ def revert_change(fields, history, field_name_id_list):
     return found_actual_sp_change
 
 
-# def changeKeyIdToKeyName(proxy, _field_id_name_list):
-#     dout = dict((_field_id_name_list[k.lower()], proxy[k]) for k in proxy.keys())
-#     return dout
-
-
-def run(_issue, _field_name_id_list, _field_id_name_list):
-    issue_key = _issue.key
+def run(_original_issue, _latest_issue, _field_name_id_list, _field_id_name_list):
+    issue_key = _original_issue.key
+    print("load " + issue_key)
     latest_fields = {}
-    latest_fields.update(vars(_issue.fields))
+    latest_fields.update(vars(_latest_issue.fields))
+    latest_fields[ISSUE_KEY] = issue_key
 
-    original_fields = vars(extract_transitions(
-        copy.deepcopy(_issue.fields),
-        copy.deepcopy(_issue.changelog.histories),
+    original_fields = {}
+    original_fields.update(vars(extract_transitions(
+        copy.deepcopy(_original_issue.fields),
+        copy.deepcopy(_original_issue.changelog.histories),
         _field_name_id_list
-    ))
+    )))
+    original_fields[ISSUE_KEY] = issue_key
 
-    transitions_history = [latest_fields, original_fields]
+
+    history = [latest_fields, original_fields]
 
     field_names = list(_field_id_name_list.keys())
-    # field_names = []
-    # for key in latest_fields.keys():
-    #     if key in _field_id_name_list:
-    #         field_names.append(_field_id_name_list[key])
-    #     else:
-    #         field_names.append(key)
+    field_names.insert(0, ISSUE_KEY)
+    return field_names, history
 
-    util.write_csv(filename="transitions_" + issue_key, field_names=field_names, data_records=transitions_history)
+    # util.write_csv(filename="transitions_" + issue_key, field_names=field_names, data_records=history)

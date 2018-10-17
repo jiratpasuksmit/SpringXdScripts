@@ -20,7 +20,7 @@ def write_csv(filename, field_names, data_records):
             writer.writerow(line)
 
 
-def remove_space_and_special_char_lowercase(string):
+def only_alphabet_lowercase(string):
     return ''.join(e for e in string.lower() if e.isalnum())
 
 

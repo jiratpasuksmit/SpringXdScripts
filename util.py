@@ -39,3 +39,4 @@ def diff_time(start, end):
     end_dt = dt.datetime.strptime(end, '%Y-%m-%dT%H:%M:%S.%f')
     diff = end_dt - start_dt
     return diff.seconds
+

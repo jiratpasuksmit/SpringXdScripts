@@ -3,7 +3,10 @@ import util
 import copy
 
 actual_sp_field_name = 'Actual Story Points'
-ISSUE_KEY = "issue_key"
+ISSUE_KEY = "_issue_key"
+HISTORIC_TYPE = "_historic_type"
+HISTORIC_TYPE_BEFORE = "before"
+HISTORIC_TYPE_LATEST = "latest"
 
 
 # def get_data(key):
@@ -43,6 +46,7 @@ def run(_original_issue, _latest_issue, _field_name_id_list, _field_id_name_list
     latest_fields = {}
     latest_fields.update(vars(_latest_issue.fields))
     latest_fields[ISSUE_KEY] = issue_key
+    latest_fields[HISTORIC_TYPE] = HISTORIC_TYPE_LATEST
 
     original_fields = {}
     original_fields.update(vars(extract_transitions(
@@ -51,12 +55,13 @@ def run(_original_issue, _latest_issue, _field_name_id_list, _field_id_name_list
         _field_name_id_list
     )))
     original_fields[ISSUE_KEY] = issue_key
-
+    original_fields[HISTORIC_TYPE] = HISTORIC_TYPE_BEFORE
 
     history = [latest_fields, original_fields]
 
     field_names = list(_field_id_name_list.keys())
     field_names.insert(0, ISSUE_KEY)
+    field_names.insert(1, HISTORIC_TYPE)
     return field_names, history
 
     # util.write_csv(filename="transitions_" + issue_key, field_names=field_names, data_records=history)

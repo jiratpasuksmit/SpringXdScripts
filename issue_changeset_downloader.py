@@ -1,7 +1,7 @@
 from jira import JIRA
 import original_issue_extractor
 import util
-
+import credential
 
 def get_field_name_id_list():
     _fields = jira.fields()
@@ -14,10 +14,13 @@ def get_field_name_id_list():
     return field_name_id, field_id_name
 
 
-jira = JIRA('https://jira.spring.io')
-project_name = "XD"
+# jira = JIRA('https://jira.spring.io')
+# project_name = "XD"
+# jira = JIRA('https://issues.apache.org/jira')
+jira = JIRA('https://jira.appcelerator.org', basic_auth=(credential.username, credential.password))
+project_name = "TIMOB"
 status = "Resolved, Done"
-jql = 'project=' + project_name + ' AND status in (' + status + ') AND "Story Points" > 0 AND "Actual Story Points"  > 0'
+jql = 'project=' + project_name + ' AND status in (' + status + ') AND "Story Points" > 0'# AND "Actual Story Points"  > 0'
 
 block_size = 100
 block_num = 0
@@ -46,4 +49,4 @@ while True:
         header_fields = field_names
         # print('%s: %s' % (issue.key, issue.fields.summary))  # import csv
 
-util.write_csv(filename="XD", field_names=header_fields, data_records=data_list)
+util.write_csv(filename=project_name, field_names=header_fields, data_records=data_list)

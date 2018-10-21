@@ -3,6 +3,7 @@ import util
 import copy
 
 sp_field_name = 'Story Points'
+actual_sp_field_name = 'Actual Story Points'
 ISSUE_KEY = "_issue_key"
 HISTORIC_TYPE = "_historic_type"
 HISTORIC_TYPE_BEFORE = "before"
@@ -41,6 +42,32 @@ def revert_change(fields, history, field_name_id_list):
         setattr(fields, original_field_name, item.fromString)
 
 
+def extract_transitions_XD(fields, histories, field_name_id_list):
+    for history in reversed(histories):
+        should_break = revert_change_XD(fields, history, field_name_id_list)
+        if should_break:
+            break
+    return fields
+
+
+def revert_change_XD(fields, history, field_name_id_list):
+    found_actual_sp_change = False
+    for item in history.items:
+        if not found_actual_sp_change:
+            found_actual_sp_change = item.field == actual_sp_field_name
+
+        history_field_name = util.only_alphabet_lowercase(item.field)
+        if history_field_name in field_name_id_list.keys():
+            original_field_name = field_name_id_list[history_field_name]
+        else:
+            history_field_name_s = history_field_name + "s"
+            original_field_name = history_field_name_s
+
+        setattr(fields, original_field_name, item.fromString)
+
+    return found_actual_sp_change
+
+
 def isSpChange(history):
     for item in history.items:
         if item.field == sp_field_name:
@@ -69,7 +96,7 @@ def run(_original_issue, _latest_issue, _field_name_id_list, _field_id_name_list
     latestFields[ISSUE_KEY] = issue_key
     latestFields[HISTORIC_TYPE] = HISTORIC_TYPE_LATEST
 
-    originalFields = convertToReadableDict(extract_transitions(
+    originalFields = convertToReadableDict(extract_transitions_XD(
         copy.deepcopy(_original_issue.fields),
         copy.deepcopy(_original_issue.changelog.histories),
         _field_name_id_list
@@ -89,6 +116,8 @@ def run(_original_issue, _latest_issue, _field_name_id_list, _field_id_name_list
 
 
 mesosSafeList = ['links', 'workflows']
+moodleSafeList = ['storypointss']
+
 
 def printIfNotInSafeList(key, value):
     if key not in [
@@ -100,6 +129,5 @@ def printIfNotInSafeList(key, value):
         '__dict__',
         '__weakref__',
         '__doc__',
-    ] and key not in mesosSafeList:
+    ] and key not in mesosSafeList and key not in moodleSafeList:
         print("cant find key = " + key + " with value " + str(value))
-

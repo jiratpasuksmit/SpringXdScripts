@@ -1,6 +1,6 @@
 from jira import JIRA
 # import original_issue_extractor
-import original_issue_extractor_sphistories
+import issue_extractor
 import util
 import credential
 import projects
@@ -45,8 +45,8 @@ def download(project_name, url, storyPointKey):
             original_issue = original_issues[x]
             latest_issue = latest_issues[x]
             # field_names, history = original_issue_extractor.run(original_issue, latest_issue, issue_field_name_id, issue_field_id_name)
-            field_names, history = original_issue_extractor_sphistories.run(original_issue, latest_issue,
-                                                                            issue_field_name_id, issue_field_id_name)
+            field_names, history = issue_extractor.run(original_issue, latest_issue,
+                                                       issue_field_name_id, issue_field_id_name)
             for item in history:
                 data_list.append(item)
             header_fields = field_names  # lowercase only
